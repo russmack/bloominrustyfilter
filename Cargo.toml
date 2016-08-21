@@ -1,0 +1,12 @@
+[package]
+name = "bloomfilter"
+version = "0.1.0"
+authors = ["russ"]
+
+[dependencies]
+fnv = "1.0.3"
+murmur3 = "0.3.0"
+
+[lib]
+name = "bloomfilter"
+
