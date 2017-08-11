@@ -2,10 +2,10 @@
 
 A bloom filter written in Rust.
 
-![Progress](http://progressed.io/bar/100?title=done)
+[![Build Status](https://travis-ci.org/russmack/bloominrustyfilter.svg?branch=master)](https://travis-ci.org/russmack/bloominrustyfilter)
 
 ---
-#### Status: Done.
+#### Status: ok.
 ----
 
 ## Usage
