@@ -1,3 +1,4 @@
+extern crate bitarray;
 extern crate fnv;
 extern crate murmur3;
 
@@ -5,8 +6,10 @@ use std::hash::Hasher;
 use fnv::FnvHasher;
 use std::io::Cursor;
 
+use bitarray::BitArray;
+
 pub struct BloomFilter {
-    pub filter: Vec<bool>,
+    pub filter: BitArray,
     pub size: u64,
     hash_funcs: Vec<HashFn>,
     total_flipped: i64,
@@ -37,8 +40,8 @@ impl BloomFilter {
         hash_funcs.push(hash_fnv1a);
         hash_funcs.push(hash_murmur3);
         BloomFilter {
-            filter: vec![false; filter_size as usize],
-            size: filter_size,
+            filter: BitArray::new(),
+            size: BitArray::new().size(),
             hash_funcs: hash_funcs,
             total_flipped: 0,
         }
@@ -50,8 +53,8 @@ impl BloomFilter {
         // those values into the results slice.
         let mut results: Vec<bool> = vec![false; self.hash_funcs.len()];
         for i in 0..self.hash_funcs.len() as usize {
-            let idx = self.get_index(key, self.hash_funcs[i]) as usize;
-            let val = self.filter[idx];
+            let idx = self.calc_index(key, self.hash_funcs[i]);
+            let val = self.filter.get(idx);
             results[i] = val;
         }
         let mut all_true = true;
@@ -67,13 +70,13 @@ impl BloomFilter {
         // Iterate over the list of hash functions, using each to reduce the string
         // to a single index in the filter, which is then flipped on.
         for j in &self.hash_funcs {
-            let idx = self.get_index(s, *j) as usize;
-            self.filter[idx] = true;
+            let idx = self.calc_index(s, *j);
+            self.filter.set(idx, true);
             self.total_flipped += 1;
         }
     }
 
-    pub fn get_index(&self, s: &str, hash_fn: HashFn) -> u64 {
+    pub fn calc_index(&self, s: &str, hash_fn: HashFn) -> u64 {
         let hash = hash_fn(s);
         let rem = hash % self.size;
         rem
