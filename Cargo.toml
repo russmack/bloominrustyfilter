@@ -6,6 +6,8 @@ authors = ["russ"]
 [dependencies]
 fnv = "1.0.3"
 murmur3 = "0.3.0"
+bitarray = { git = "https://github.com/russmack/bitarray-rust" }
+#bitarray = { path = "../bitarray-rust" }
 
 [lib]
 name = "bloomfilter"
