@@ -3,8 +3,9 @@ extern crate fnv;
 extern crate murmur3;
 
 use std::hash::Hasher;
-use fnv::FnvHasher;
 use std::io::Cursor;
+
+use fnv::FnvHasher;
 
 use bitarray::BitArray;
 
@@ -28,8 +29,8 @@ fn hash_murmur3(bytes: &str) -> u64 {
     murmur3::murmur3_x64_128(&mut Cursor::new(bytes), 0, &mut out);
     let mut hash: u64 = 0;
     for byte in out.iter() {
-        hash = hash ^ (*byte as u64);
-        hash = hash.wrapping_mul(0x100000001b3);
+        hash ^= *byte as u64;
+        hash = hash.wrapping_mul(0x0100_0000_01b3);
     }
     hash
 }
@@ -42,7 +43,7 @@ impl BloomFilter {
         BloomFilter {
             filter: BitArray::new(),
             size: BitArray::new().size(),
-            hash_funcs: hash_funcs,
+            hash_funcs,
             total_flipped: 0,
         }
     }
@@ -52,10 +53,10 @@ impl BloomFilter {
         // index returned get the value at that index in the bloom filter, and put
         // those values into the results slice.
         let mut results: Vec<bool> = vec![false; self.hash_funcs.len()];
-        for i in 0..self.hash_funcs.len() as usize {
+        for (i, res) in results.iter_mut().enumerate() {
             let idx = self.calc_index(key, self.hash_funcs[i]);
             let val = self.filter.get(idx);
-            results[i] = val;
+            *res = val;
         }
         let mut all_true = true;
         // Iterate over the switch values retrieved from the bloom filter.
@@ -78,8 +79,7 @@ impl BloomFilter {
 
     pub fn calc_index(&self, s: &str, hash_fn: HashFn) -> u64 {
         let hash = hash_fn(s);
-        let rem = hash % self.size;
-        rem
+        hash % self.size
     }
 }
 
