@@ -1,11 +1,12 @@
 [package]
+edition = "2024"
 name = "bloomfilter"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["russ"]
 
 [dependencies]
 fnv = "1.0.3"
-murmur3 = "0.3.0"
+murmur3 = "0.5.2"
 bitarray = { git = "https://github.com/russmack/bitarray-rust" }
 #bitarray = { path = "../bitarray-rust" }
 

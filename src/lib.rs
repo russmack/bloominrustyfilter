@@ -25,10 +25,15 @@ fn hash_fnv1a(bytes: &str) -> u64 {
 }
 
 fn hash_murmur3(bytes: &str) -> u64 {
-    let mut out: [u8; 16] = [0; 16];
-    murmur3::murmur3_x64_128(&mut Cursor::new(bytes), 0, &mut out);
+    let result = murmur3::murmur3_x64_128(&mut Cursor::new(bytes), 0)
+        .expect("Failed to compute Murmur3 hash");
+
+    // Convert u128 to [u8; 16] for post-processing
+    let bytes = result.to_le_bytes();
+
+    // Post-process to 64-bit hash
     let mut hash: u64 = 0;
-    for byte in out.iter() {
+    for byte in bytes.iter() {
         hash ^= *byte as u64;
         hash = hash.wrapping_mul(0x0100_0000_01b3);
     }
